@@ -1,5 +1,8 @@
 addpath('../')
 
+% all pvlib python values taken from
+% https://github.com/pvlib/pvlib-python/pull/535
+
 % set up input data (same as pvlib python)
 
 SurfTilt = 40
@@ -20,8 +23,6 @@ SunZen = ephem_data(:, 1).'
 SunAz = ephem_data(:, 5).'
 
 
-
-
 %% Test Hay Davies Matlab
 SkyDiffuse = pvl_haydavies1980(SurfTilt, SurfAz, DHI, DNI, HExtra, SunZen, SunAz)
 Expected = [         0
@@ -32,7 +33,7 @@ assert(all(abs(SkyDiffuse - Expected) < 0.0001))
 
 %% Test Hay Davies matlab against python
 SkyDiffuse = pvl_haydavies1980(SurfTilt, SurfAz, DHI, DNI, HExtra, SunZen, SunAz)
-Expected = [0., 14.967008, 102.994862, 33.190865].'
+Expected = [   0.        ,   27.17751419,  102.99486181,   33.19086529].'
 assert(all(abs(SkyDiffuse - Expected) < 0.0001))
 
 
@@ -47,7 +48,8 @@ assert(all(abs(SkyDiffuse - Expected) < 0.0001))
 
 %% Test Reindl 1990 matlab against python
 SkyDiffuse = pvl_reindl1990(SurfTilt, SurfAz, DHI, DNI, GHI, HExtra, SunZen, SunAz)
-Expected = [NaN, 15.730664, 104.131724, 34.166258].'
+% pvlib python returns np.nan for first element. matlab returns 0. use 0 here
+Expected = [0,   27.94116987,  104.13172366,   34.16625815].'
 assert(all(abs(SkyDiffuse - Expected) < 0.0001))
 
 
@@ -62,5 +64,6 @@ assert(all(abs(SkyDiffuse - Expected) < 0.0001))
 
 %% Test Klucher matlab against python
 SkyDiffuse = pvl_klucher1979(SurfTilt, SurfAz, DHI, GHI, SunZen, SunAz)
-Expected = [0, 37.446276, 109.209347, 56.965916].'
+% pvlib python fixes a bug with cos_tt where AOI > 90
+Expected = [   0.        ,   36.78979376,  109.20934707,   56.96591615].'
 assert(all(abs(SkyDiffuse - Expected) < 0.0001))
